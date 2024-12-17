@@ -11,20 +11,20 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import sg.motion.tutorialfirebase.core.routes.AppRoutes
-import sg.motion.tutorialfirebase.ui.auth.AuthHandler
+import sg.motion.tutorialfirebase.data.repository.AuthRepository
 
 // Splash Screen
 @Composable
 fun SplashScreen(
     navController: NavController,
-    authHandler: AuthHandler
+    authRepository: AuthRepository
 ) {
     // Simple logic to determine initial navigation
     LaunchedEffect(Unit) {
         // Simulate some startup logic
         delay(1500) // Optional delay to show splash screen
 
-        if (authHandler.isLoggedIn()) {
+        if (authRepository.isUserLoggedIn()) {
             // Navigate to home if already logged in
             navController.navigate(AppRoutes.Home.route) {
                 // Clear the back stack

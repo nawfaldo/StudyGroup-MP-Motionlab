@@ -19,11 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import sg.motion.tutorialfirebase.core.routes.AppRoutes
-import sg.motion.tutorialfirebase.ui.auth.AuthHandler
+import sg.motion.tutorialfirebase.data.repository.AuthRepository
 
 // Placeholder screens for Profile and Settings
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, authRepository: AuthRepository) {
     val context = LocalContext.current
     Scaffold(
         bottomBar = {
@@ -60,8 +60,7 @@ fun ProfileScreen(navController: NavController) {
             Button(
                 onClick = {
                     // Logout logic
-                    val authHandler = AuthHandler(context)
-                    authHandler.saveLoginState(false)
+                    // TODO : do logout here!
 
                     // Navigate back to login
                     navController.navigate(AppRoutes.Login.route) {
