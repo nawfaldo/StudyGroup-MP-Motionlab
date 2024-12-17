@@ -23,7 +23,7 @@ import sg.motion.tutorialfirebase.data.repository.AuthRepository
 
 // Placeholder screens for Profile and Settings
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController, authRepository: AuthRepository) {
     val context = LocalContext.current
     Scaffold(
         bottomBar = {
@@ -60,8 +60,7 @@ fun ProfileScreen(navController: NavController) {
             Button(
                 onClick = {
                     // Logout logic
-                    val authRepository = AuthRepository(context)
-                    authRepository.logout()
+                    // TODO : do logout here!
 
                     // Navigate back to login
                     navController.navigate(AppRoutes.Login.route) {

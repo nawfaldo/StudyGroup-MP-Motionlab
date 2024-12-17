@@ -1,24 +1,18 @@
 package sg.motion.tutorialfirebase.ui.home
 
-import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,9 +37,7 @@ import kotlinx.coroutines.launch
 import sg.motion.tutorialfirebase.core.routes.AppRoutes
 import sg.motion.tutorialfirebase.data.model.Note
 import sg.motion.tutorialfirebase.data.repository.AuthRepository
-import sg.motion.tutorialfirebase.data.repository.NotesRepository
 import sg.motion.tutorialfirebase.ui.home.widgets.NoteItem
-import java.util.Date
 
 // Home Screen with Bottom Navigation
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,31 +50,22 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
 
     // Get current user ID for notes repository
     val userId = authRepository.getCurrentUserId() ?: return
-    val notesRepository = remember { NotesRepository(userId) }
+    // TODO : init notes repository here !
 
     // Coroutine scope for async operations
     val scope = rememberCoroutineScope()
 
     // Collect notes
     LaunchedEffect(Unit) {
+        // IMPORTANT : Please select one of load type ( once / real time)
+
         // Collect Notes One time
-        notesRepository.getNotes().collect { result ->
-            result.onSuccess {
-                notes = it
-            }.onFailure {
-                errorMessage = it.localizedMessage ?: "Failed to load notes"
-            }
-        }
+        // TODO : load all notes once here!
+
 
         // Collect Notes Real time
-//        notesRepository.getNotesRealTime().collect { result ->
-//            result.onSuccess { updatedNotes ->
-//                // Notes will automatically update in real-time
-//                notes = updatedNotes
-//            }.onFailure {
-//                errorMessage = it.localizedMessage ?: "Failed to load notes"
-//            }
-//        }
+        // TODO : load realtime notes here!
+
     }
 
     Scaffold(
@@ -93,7 +76,8 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
                     IconButton(
                         onClick = {
                             // Logout logic
-                            authRepository.logout()
+                            // TODO :  Do logout Here!
+
                             navController.navigate(AppRoutes.Login.route) {
                                 popUpTo(AppRoutes.Home.route) { inclusive = true }
                             }
@@ -151,21 +135,7 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
                     onClick = {
                         // Create new note
                         if (newNoteContent.isNotBlank()) {
-                            scope.launch {
-                                val newNote = Note(
-                                    content = newNoteContent,
-                                    userId = userId,
-                                    createdAt = Date()
-                                )
-
-                                val result = notesRepository.createNote(newNote)
-                                result.onFailure {
-                                    errorMessage = it.localizedMessage ?: "Failed to create note"
-                                }
-
-                                // Clear input after creating note
-                                newNoteContent = ""
-                            }
+                            // TODO : call create note repository here if note is not empty !
                         }
                     }
                 ) {
@@ -185,15 +155,13 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
 
             // Notes List
             LazyColumn {
+                // Load all notes
                 items(notes) { note ->
                     NoteItem(
                         note = note,
                         onDelete = {
                             scope.launch {
-                                val result = notesRepository.deleteNote(note.id)
-                                result.onFailure {
-                                    errorMessage = it.localizedMessage ?: "Failed to delete note"
-                                }
+                                // TODO :  call delete note from repository here!
                             }
                         }
                     )

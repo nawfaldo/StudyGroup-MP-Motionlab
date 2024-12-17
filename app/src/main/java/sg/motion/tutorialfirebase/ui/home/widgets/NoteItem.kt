@@ -37,7 +37,7 @@ fun NoteItem(
         ) {
             // Note Content
             Text(
-                text = note.content,
+                text = "this is notes", // TODO : change text with note content Here!
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium
             )

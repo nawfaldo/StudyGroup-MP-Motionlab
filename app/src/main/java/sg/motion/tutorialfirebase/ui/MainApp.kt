@@ -47,7 +47,7 @@ fun AppNavigation() {
 
         // Profile Screen
         composable(AppRoutes.Profile.route) {
-            ProfileScreen(navController)
+            ProfileScreen(navController, authRepository)
         }
     }
 }

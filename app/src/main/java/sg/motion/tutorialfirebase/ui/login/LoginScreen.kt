@@ -82,14 +82,7 @@ fun LoginScreen(
             onClick = {
                 errorMessage = ""
                 scope.launch {
-                    val result = authRepository.signInWithEmailPassword(email, password)
-                    result.onSuccess {
-                        navController.navigate(AppRoutes.Home.route) {
-                            popUpTo(AppRoutes.Login.route) { inclusive = true }
-                        }
-                    }.onFailure {
-                        errorMessage = it.localizedMessage ?: "Login Failed"
-                    }
+                    // TODO : call sign in with email from repository here!
                 }
             },
             modifier = Modifier.fillMaxWidth()

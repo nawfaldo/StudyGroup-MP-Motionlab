@@ -1,28 +1,23 @@
 package sg.motion.tutorialfirebase.data.repository
 
 import android.util.Log
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.tasks.await
 import sg.motion.tutorialfirebase.data.model.Note
 
 class NotesRepository(private val userId: String) {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val notesCollection = firestore.collection("notes")
+    // TODO : init Firestore Here!
+    // TODO : For easy to access init collection here !
 
     // Create a new note
     suspend fun createNote(note: Note): Result<String> {
         return try {
             // Ensure the note is associated with the current user
-            val noteWithUserId = note.copy(userId = userId)
-            val docRef = notesCollection.add(noteWithUserId).await()
-            Result.success(docRef.id)
+            // TODO : add new Document to Firestore Here!
+
+            Result.success("success")
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -31,15 +26,10 @@ class NotesRepository(private val userId: String) {
     // Get all notes for the current user
     fun getNotes(): Flow<Result<List<Note>>> = flow {
         try {
-            val snapshot = notesCollection
-                .whereEqualTo("userId", userId)
-                .orderBy("createdAt")
-                .get()
-                .await()
+            // TODO : get list of notes here!
 
-            val notes = snapshot.documents.mapNotNull { doc ->
-                doc.toObject<Note>()?.copy(id = doc.id)
-            }
+            // TODO : convert Documents to List of object Here !
+            val notes = listOf<Note>()
 
             emit(Result.success(notes))
         } catch (e: Exception) {
@@ -51,36 +41,18 @@ class NotesRepository(private val userId: String) {
     // Real-time notes listener with Flow
     fun getNotesRealTime(): Flow<Result<List<Note>>> = callbackFlow {
         // Create a listener for real-time updates
-        val listenerRegistration: ListenerRegistration = notesCollection
-            .whereEqualTo("userId", userId)
-            .orderBy("createdAt")
-            .addSnapshotListener { snapshot, e ->
-                // Handle any errors
-                if (e != null) {
-                    Log.e("NotesRepository", "getNotesRealTime: "+ e.localizedMessage)
-                    trySend(Result.failure(e))
-                    return@addSnapshotListener
-                }
-
-                // Process the snapshot
-                if (snapshot != null) {
-                    val notes = snapshot.documents.mapNotNull { doc ->
-                        doc.toObject<Note>()?.copy(id = doc.id)
-                    }
-                    trySend(Result.success(notes))
-                }
-            }
+        // TODO : create listener to listen firestore realtime collections here!
 
         // Ensure the listener is properly closed when the flow is cancelled
         awaitClose {
-            listenerRegistration.remove()
+            // TODO : don't forget to remove listener here!
         }
     }
 
     // Delete a note
-    suspend fun deleteNote(noteId: String): Result<Unit> {
+    suspend fun deleteNote(): Result<Unit> {
         return try {
-            notesCollection.document(noteId).delete().await()
+            // TODO : implement delete notes here!
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -88,9 +60,9 @@ class NotesRepository(private val userId: String) {
     }
 
     // Update an existing note
-    suspend fun updateNote(note: Note): Result<Unit> {
+    suspend fun updateNote(): Result<Unit> {
         return try {
-            notesCollection.document(note.id).set(note).await()
+            // TODO : implement update notes here!
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
