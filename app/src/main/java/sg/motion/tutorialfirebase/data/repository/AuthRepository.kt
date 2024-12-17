@@ -3,6 +3,7 @@ package sg.motion.tutorialfirebase.data.repository
 import android.content.Context
 
 class AuthRepository(private val context: Context) {
+    // TODO : init Firebase Auth Here!
 
     // Email and Password Authentication
     suspend fun signInWithEmailPassword(email: String, password: String): Result<String> {

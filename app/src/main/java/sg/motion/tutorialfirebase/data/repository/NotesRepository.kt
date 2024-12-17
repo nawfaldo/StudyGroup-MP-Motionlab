@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flow
 import sg.motion.tutorialfirebase.data.model.Note
 
 class NotesRepository(private val userId: String) {
-    // TODO : init Firestore Here!
+    // TODO : init Firestore Database Here!
     // TODO : For easy to access init collection here !
 
     // Create a new note
