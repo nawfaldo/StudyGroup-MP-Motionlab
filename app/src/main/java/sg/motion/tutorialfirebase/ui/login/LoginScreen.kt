@@ -16,24 +16,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import sg.motion.tutorialfirebase.core.routes.AppRoutes
-import sg.motion.tutorialfirebase.ui.auth.AuthHandler
+import sg.motion.tutorialfirebase.data.repository.AuthRepository
 
 // Login Screen with Navigation
 @Composable
 fun LoginScreen(
     navController: NavController,
-    authHandler: AuthHandler
+    authRepository: AuthRepository
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -72,20 +77,19 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Login Button
+        // Email Login Button
         Button(
             onClick = {
                 errorMessage = ""
-                if (authHandler.login(email, password)) {
-                    // Save login state
-                    authHandler.saveLoginState(true)
-
-                    // Navigate to Home and clear back stack
-                    navController.navigate(AppRoutes.Home.route) {
-                        popUpTo(AppRoutes.Login.route) { inclusive = true }
+                scope.launch {
+                    val result = authRepository.signInWithEmailPassword(email, password)
+                    result.onSuccess {
+                        navController.navigate(AppRoutes.Home.route) {
+                            popUpTo(AppRoutes.Login.route) { inclusive = true }
+                        }
+                    }.onFailure {
+                        errorMessage = it.localizedMessage ?: "Login Failed"
                     }
-                } else {
-                    errorMessage = "Invalid email or password"
                 }
             },
             modifier = Modifier.fillMaxWidth()

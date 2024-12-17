@@ -16,25 +16,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import sg.motion.tutorialfirebase.core.routes.AppRoutes
-import sg.motion.tutorialfirebase.ui.auth.AuthHandler
+import sg.motion.tutorialfirebase.data.repository.AuthRepository
 
 // Register Screen
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    authHandler: AuthHandler
+    authRepository: AuthRepository
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -88,21 +91,34 @@ fun RegisterScreen(
         Button(
             onClick = {
                 errorMessage = ""
-                if (password != confirmPassword) {
-                    errorMessage = "Passwords do not match"
-                    return@Button
+
+                // Validation
+                when {
+                    email.isBlank() -> {
+                        errorMessage = "Email cannot be empty"
+                        return@Button
+                    }
+                    password.length < 6 -> {
+                        errorMessage = "Password must be at least 6 characters"
+                        return@Button
+                    }
+                    password != confirmPassword -> {
+                        errorMessage = "Passwords do not match"
+                        return@Button
+                    }
                 }
 
-                if (authHandler.register(email, password)) {
-                    // Save login state
-                    authHandler.saveLoginState(true)
-
-                    // Navigate to Home and clear back stack
-                    navController.navigate(AppRoutes.Home.route) {
-                        popUpTo(AppRoutes.Register.route) { inclusive = true }
+                // Registration
+                scope.launch {
+                    val result = authRepository.registerWithEmailPassword(email, password)
+                    result.onSuccess {
+                        // Navigate to home screen after successful registration
+                        navController.navigate(AppRoutes.Home.route) {
+                            popUpTo(AppRoutes.Register.route) { inclusive = true }
+                        }
+                    }.onFailure {
+                        errorMessage = it.localizedMessage ?: "Registration Failed"
                     }
-                } else {
-                    errorMessage = "Registration failed. Check your details."
                 }
             },
             modifier = Modifier.fillMaxWidth()
