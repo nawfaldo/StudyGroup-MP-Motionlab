@@ -48,8 +48,6 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
     var notes by remember { mutableStateOf(listOf<Note>()) }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Get current user ID for notes repository
-    val userId = authRepository.getCurrentUserId() ?: return
     // TODO : init notes repository here !
 
     // Coroutine scope for async operations
@@ -125,13 +123,13 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
                     value = newNoteContent,
                     onValueChange = { newNoteContent = it },
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(9f)
                         .padding(16.dp),
                     placeholder = { Text("Write a new note...") },
                     maxLines = 3
                 )
                 IconButton(
-                    modifier = Modifier.size(24.dp).padding(8.dp),
+                    modifier = Modifier.weight(1f).size(24.dp),
                     onClick = {
                         // Create new note
                         if (newNoteContent.isNotBlank()) {
