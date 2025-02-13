@@ -111,6 +111,14 @@ fun RegisterScreen(
                 // Registration
                 scope.launch {
                     // TODO : call register with email from repository here!
+                    val result = authRepository.registerWithEmailPassword(email, password)
+                    result.onSuccess {
+                        navController.navigate(AppRoutes.Home.route) {
+                            popUpTo(AppRoutes.Login.route) { inclusive = true }
+                        }
+                    }.onFailure { e ->
+                        errorMessage = e.localizedMessage ?: "Register Failed"
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()

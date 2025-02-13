@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "502386575837",
+    "project_id": "sg-motion-firebase-c20d2",
+    "storage_bucket": "sg-motion-firebase-c20d2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:502386575837:android:fffd55b65083e04cb9ce34",
+        "android_client_info": {
+          "package_name": "sg.motion.tutorialfirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9qr6pyQA7tQgdczY1dhiy4_1AUkG9vFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

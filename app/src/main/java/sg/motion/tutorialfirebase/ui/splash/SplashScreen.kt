@@ -25,9 +25,14 @@ fun SplashScreen(
         delay(1500) // Optional delay to show splash screen
 
         // TODO : Check logged user here and navigate to home if user already login before !
-        // Navigate to login
-        navController.navigate(AppRoutes.Login.route) {
-            popUpTo(AppRoutes.Splash.route) { inclusive = true }
+        if(authRepository.isUserLoggedIn()) {
+            navController.navigate(AppRoutes.Home.route) {
+                popUpTo(AppRoutes.Splash.route) { inclusive = true }
+            }
+        } else {
+            navController.navigate(AppRoutes.Login.route) {
+                popUpTo(AppRoutes.Splash.route) { inclusive = true }
+            }
         }
     }
 

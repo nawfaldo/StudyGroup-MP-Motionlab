@@ -61,6 +61,7 @@ fun ProfileScreen(navController: NavController, authRepository: AuthRepository) 
                 onClick = {
                     // Logout logic
                     // TODO : do logout here!
+                    authRepository.logout()
 
                     // Navigate back to login
                     navController.navigate(AppRoutes.Login.route) {

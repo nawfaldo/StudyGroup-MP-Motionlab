@@ -34,9 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import java.util.Date
 import sg.motion.tutorialfirebase.core.routes.AppRoutes
 import sg.motion.tutorialfirebase.data.model.Note
 import sg.motion.tutorialfirebase.data.repository.AuthRepository
+import sg.motion.tutorialfirebase.data.repository.NotesRepository
 import sg.motion.tutorialfirebase.ui.home.widgets.NoteItem
 
 // Home Screen with Bottom Navigation
@@ -49,6 +51,9 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
     var errorMessage by remember { mutableStateOf("") }
 
     // TODO : init notes repository here !
+    val userId = authRepository.getCurrentUserId() ?: return
+    val notesRepository = remember { NotesRepository(userId) }
+
 
     // Coroutine scope for async operations
     val scope = rememberCoroutineScope()
@@ -59,11 +64,23 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
 
         // Collect Notes One time
         // TODO : load all notes once here!
-
+        notesRepository.getNotes().collect { result ->
+            result.onSuccess { updatedNotes ->
+                notes = updatedNotes
+            }.onFailure {
+                errorMessage = it.localizedMessage ?: "Failed to load notes"
+            }
+        }
 
         // Collect Notes Real time
         // TODO : load realtime notes here!
-
+        notesRepository.getNotesRealTime().collect { result ->
+            result.onSuccess { updatedNotes ->
+                notes = updatedNotes
+            }.onFailure {
+                errorMessage = it.localizedMessage ?: "Failed to load notes"
+            }
+        }
     }
 
     Scaffold(
@@ -75,6 +92,7 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
                         onClick = {
                             // Logout logic
                             // TODO :  Do logout Here!
+                            authRepository.logout()
 
                             navController.navigate(AppRoutes.Login.route) {
                                 popUpTo(AppRoutes.Home.route) { inclusive = true }
@@ -132,8 +150,24 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
                     modifier = Modifier.weight(1f).size(24.dp),
                     onClick = {
                         // Create new note
-                        if (newNoteContent.isNotBlank()) {
-                            // TODO : call create note repository here if note is not empty !
+                        // TODO : call create note repository here if note is not empty !
+                        scope.launch {
+                            if (newNoteContent.isNotBlank()) {
+                                if (newNoteContent.isNotBlank()) {
+                                    val newNote = Note(
+                                        content = newNoteContent,
+                                        userId = userId,
+                                        createdAt = Date()
+                                    )
+
+                                    val result = notesRepository.createNote(newNote)
+                                    result.onFailure {
+                                        errorMessage = it.localizedMessage ?: "Failed to create note"
+                                    }
+
+                                    newNoteContent = ""
+                                }
+                            }
                         }
                     }
                 ) {
@@ -160,6 +194,10 @@ fun HomeScreen(navController: NavController, authRepository: AuthRepository) {
                         onDelete = {
                             scope.launch {
                                 // TODO :  call delete note from repository here!
+                                val result = notesRepository.deleteNote(note.id)
+                                result.onFailure {
+                                    errorMessage = it.localizedMessage ?: "Failed to delete note"
+                                }
                             }
                         }
                     )
