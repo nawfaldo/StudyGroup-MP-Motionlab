@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -16,31 +17,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
-import com.example.tutorialroom.data.model.Contact
+import com.example.tutorialroom.data.local.Contact
+import com.example.tutorialroom.data.local.ContactDatabase
+import com.example.tutorialroom.data.repository.ContactRepository
 import com.example.tutorialroom.ui.home.widget.AddContactDialog
 import com.example.tutorialroom.ui.home.widget.ContactItem
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     navController: NavController,
 ) {
     var openDialog by remember { mutableStateOf(false) }
-    var contacts by remember { mutableStateOf(listOf<Contact>()) }
     var selectedContact by remember { mutableStateOf(Contact()) }
     var isEdit by remember { mutableStateOf(false) }
 
     // TODO: Remove this after implementing Room Database
     // Dummy 2 contacts
-    if (contacts.isEmpty()) {
-        contacts = listOf(
-            Contact(id = 1, name = "John Doe", number = "1234567890"),
-            Contact(id = 2, name = "Jane Doe", number = "0987654321")
-        )
-    }
+
+    val context = LocalContext.current
+
+    val database = remember { ContactDatabase.getDatabase(context) }
+    val contactRepository = remember { ContactRepository.getInstance(database.contactDao()) }
+
+    val scope = rememberCoroutineScope()
+
+    val contacts by contactRepository.getContacts().observeAsState(emptyList())
 
     Scaffold(
         floatingActionButton = {
@@ -70,17 +78,15 @@ fun HomeScreen(
                     onSave = { contact ->
                         if (isEdit) {
                             // TODO: Replace this with Room Database implementation
-                            contacts = contacts.map {
-                                if (it.id == contact.id) {
-                                    contact
-                                } else {
-                                    it
-                                }
+                            scope.launch {
+                                contactRepository.updateContact(contact)
                             }
                             openDialog = false
                         } else {
                             // TODO: Replace this with Room Database implementation
-                            contacts = contacts.plus(contact)
+                            scope.launch {
+                                contactRepository.insertContact(contact)
+                            }
                             openDialog = false
                         }
 
@@ -109,7 +115,9 @@ fun HomeScreen(
                             },
                             onDelete = {
                                 // TODO: Replace this with Room Database implementation
-                                contacts = contacts.minus(it)
+                                scope.launch {
+                                    contactRepository.deleteContact(contact)
+                                }
                             }
                         )
                     }
