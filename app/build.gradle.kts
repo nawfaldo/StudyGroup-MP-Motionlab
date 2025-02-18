@@ -51,8 +51,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     // TODO: add implementation of com.squareup.retrofit2:retrofit:2.11.0
+    implementation(libs.retrofit)
     // TODO: add implementation of com.squareup.retrofit2:converter-gson:2.11.0
+    implementation(libs.converter.gson)
     // TODO: add implementation of com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14
+    implementation(libs.logging.interceptor)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

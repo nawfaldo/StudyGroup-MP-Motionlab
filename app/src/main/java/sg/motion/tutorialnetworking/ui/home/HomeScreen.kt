@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import sg.motion.tutorialnetworking.data.model.Note
+import sg.motion.tutorialnetworking.data.repository.NotesRepository
 import sg.motion.tutorialnetworking.ui.home.widgets.NoteFormBottomSheet
 import sg.motion.tutorialnetworking.ui.home.widgets.NoteItem
 
@@ -41,6 +42,7 @@ fun HomeScreen(navController: NavController) {
     var isEditing by remember { mutableStateOf(false) }
 
     // TODO : init notes repository here !
+    val notesRepository = remember { NotesRepository() }
 
     // Coroutine scope for async operations
     val scope = rememberCoroutineScope()
@@ -50,12 +52,18 @@ fun HomeScreen(navController: NavController) {
         selectedNotes = Note()
 
         // TODO: call get all notes here!
+        notesRepository.getAllNotes().onSuccess { value ->
+            notes = value
+        }.onFailure { exception ->
+            errorMessage = exception.message.orEmpty()
+        }
     }
 
     // Collect notes for first time
     LaunchedEffect(Unit) {
         scope.launch {
             // TODO : call load all data here!
+            loadAllData()
         }
     }
 
@@ -109,6 +117,13 @@ fun HomeScreen(navController: NavController) {
                         onDelete = {
                             scope.launch {
                                 // TODO: Call delete note here!
+                                note.id?.let { id ->
+                                    notesRepository.deleteNote("a").onSuccess { value ->
+                                        loadAllData()
+                                    }.onFailure { exception ->
+                                        errorMessage = exception.message.orEmpty()
+                                    }
+                                }
                             }
                         }
                     )
@@ -124,8 +139,18 @@ fun HomeScreen(navController: NavController) {
                     scope.launch {
                         if (isEditing) {
                             // TODO: Call update Note here!
+                            notesRepository.updateNoteWithPut(note).onSuccess { value ->
+                                loadAllData()
+                            }.onFailure { exception ->
+                                errorMessage = exception.message.orEmpty()
+                            }
                         } else {
                             // TODO: Call create new Note here!
+                            notesRepository.createNote(note).onSuccess { value ->
+                                loadAllData()
+                            }.onFailure { exception ->
+                                errorMessage = exception.message.orEmpty()
+                            }
                         }
                     }
                 },
